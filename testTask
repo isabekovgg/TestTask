@@ -1,0 +1,100 @@
+   1) How would you handle a StaleElementReferenceException? Please provide a
+   code fragment or fragments, if you know about several common ways of handling.
+   
+   //1st way just to refresh page and find refreshed element
+
+    //2nd way to use try catch, and wait till element will refresh and appear in dom
+   
+   async waitForElement(locator){
+        let stateElement = true
+
+        while(stateElement){
+            try{
+                await this.driver.wait(until.elementLocated(locator), expectedTimeout)
+                stateElement = false
+            } catch(e){
+                stateElement = true
+            }
+        }
+    }
+    //3rd way to use ExpectedConditions of Selenium WebDriver as presenceOfElement or refreshed
+    //4th use waitForElement
+    
+    if it's in terms of selenide, usually it handles all of this stuff by itself
+    However, there may be problems with Lists, because Selenide using snapshot() method for iterations
+    it could be solved like:
+    
+    int i = 0;
+      for (SelenideElement item : list) {
+        list.get(i).click();//using get refreshes the list
+        index++;
+      }
+    
+    2) Call https://freegeoip.app/json/ API and perform the following actions:
+    a) Assert the response code;
+    b) Parse the response;
+    c) Assert your latitude and longitude with a 0.01° tolerance (assume you know
+    your actual lat and lon).
+    
+    val response = our_response
+    
+    a)
+      int statusCode = response.getStatusCode();
+      Assert.assertEquals(statusCode, 200, "Verify that status code equals '200'");
+    or
+      .getResponse
+      .verify("Verify that status code equals '200'", s ->
+        s.getStatusCode().shoulBe(equal(200))
+      );
+    
+    b)
+      val body = response.getBody();
+      val parse = JSON.parse(body);
+    
+    c)
+      .parse
+      .verify("verify that lat and long are correct with tolerance of 0.01", s -> {
+        s.data.location.latitude.sizeLessThan(knownValue+0.01);
+        s.data.location.latitude.sizeMoreThan(knownValue-0.01);
+        s.data.location.longitude.sizeLessThan(knownValue+0.01);
+        s.data.location.longitude.sizeMoreThan(knownValue-0.01);
+      });
+    
+    3) Provide a code fragment that switches the current browser to another tab
+    (consider there are only 2 tabs). Please comment on the code in detail
+    
+    if we are using selenide it's just:
+    switchTo(tab_name)//swithcing by tab name
+    or
+    switchTo(1)//switching to the tab by index
+    but if we use raw selenium it should be something like:
+
+    ArrayList<String> tabsList = new ArrayList<String> (driver.getWindowHandles());
+    driver.switchTo(tabsList.get(1));//also using index to access second tab
+    
+    And most straightforward way is to use js Actions selenide/selenium:
+    
+    actions().sendKeys(Keys.CONTROL,Keys.TAB).perform()
+    
+    new Actions(driver).sendKeys(Keys.chord(Keys.CONTROL, Keys.TAB)).perform();
+    //because it's only two tabs we can also use combination CONTROL+SHIFT+TAB
+    
+    4) Imagine the following scenario: you click on a button that should redirect you to a
+    new page, but the page URL stays the same and the DOM structure stays almost
+    the same. Provide a code fragment to wait explicitly for the page to unload. Waiting
+    for the page to load is not necessary (perhaps you want to gracefully handle some
+    errors in case you are left on the same page).
+    
+    Very interesting and tricky task, never happened in my practice, but I think this code should work:
+    
+    WebDriverWait wait = new WebDriverWait(myDriver, Duration.ofSeconds(expected_timeout));
+    wait.until(webDriver -> "loading".equals(((JavascriptExecutor) webDriver)
+      .executeScript("return document.readyState")));
+    //document.readyState has 3 states:
+    //complete = when all of the content on the page is loaded and interactible
+    //interactive = when u can interact with page, but not everything loaded as images, etc.
+    //loading = when DOM is still loading
+    
+    
+    
+ 
