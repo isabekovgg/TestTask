@@ -87,14 +87,10 @@
     
     Very interesting and tricky task, never happened in my practice, but I think this code should work:
     
-    WebDriverWait wait = new WebDriverWait(myDriver, Duration.ofSeconds(expected_timeout));
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(expected_timeout));
     wait.until(webDriver -> "loading".equals(((JavascriptExecutor) webDriver)
       .executeScript("return document.readyState")));
     //document.readyState has 3 states:
     //complete = when all of the content on the page is loaded and interactible
     //interactive = when u can interact with page, but not everything loaded as images, etc.
     //loading = when DOM is still loading
-    
-    
-    
- 
